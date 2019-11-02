@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="UTF-8">
+      <title>Thrid Eye - Hazard Detector</title>
+      <script src="node_modules/@azure/ms-rest-js/dist/msRest.browser.js"></script>
+      <script src="node_modules/@azure/cognitiveservices-computervision/dist/cognitiveservices-computervision.js"></script>
+   </head>
+   <body>
+      <div>
+          Computer Vision Key:      <br> <input id="visionkey" type="text" size="50" ><p>
+          Computer Vision End Point: <br><input id="visionendpoint" size="50" type="text"><br>
+      </div>
+      <p>
+         <button onclick="startWebcam();">Start WebCam</button>
+         <button onclick="mediaStream.stop();">Stop WebCam</button>
+      </p>
+      <canvas id="canvas" width="640" height="480"></canvas>
+      <video  width=640 height=480 id="video" autoplay></video>
+      <p>
+         <script>
+            function drawBoundary(result) {
+            
+                for (i = 0; i < result.objects.length ; i++) {
+            
+                    var canvas = document.getElementById('canvas');
+                    var ctx    = canvas.getContext('2d');
+            
+                    ctx.beginPath();
+                    ctx.lineWidth = "6";
+                    
+            
+                    var object_class = result.objects[i].object;
+                    if (object_class == "person") {
+                        ctx.fillStyle = "red";
+                        ctx.strokeStyle = "red";
+                    } else {
+                        ctx.fillStyle = "Chartreuse";
+                        ctx.strokeStyle = "Chartreuse";
+                    }
+            
+            
+                    ctx.font = "22px Arial";
+                    ctx.fillText(result.objects[i].object+" (confidence: "+result.objects[i].confidence+")", result.objects[i].rectangle.x, result.objects[i].rectangle.y-10); 
+                    ctx.rect(result.objects[i].rectangle.x, result.objects[i].rectangle.y, result.objects[i].rectangle.w, result.objects[i].rectangle.h);
+                    ctx.stroke();
+                }   
+            }
+            
+                var canvas = document.getElementById('canvas');
+                var ctx    = canvas.getContext('2d');
+                var video  = document.getElementById('video');
+            
+                video.addEventListener('play', function () {
+                    var $this = this; //cache
+                    (function loop() {
+                        if (!$this.paused && !$this.ended) {
+                            ctx.drawImage($this, 0, 0);
+                            setTimeout(loop, 1000 / 5); // drawing at 30fps
+            
+                            document.getElementById("video").style.display="none"; 
+                            var blob = b64toBlob(canvas.toDataURL());
+                            detect_object(blob)
+                        }
+                    })();
+                }, 0);
+            
+            
+                 function b64toBlob(dataURI) {
+                 
+                   var byteString = atob(dataURI.split(',')[1]);
+                   var ab = new ArrayBuffer(byteString.length);
+                   var ia = new Uint8Array(ab);
+                 
+                   for (var i = 0; i < byteString.length; i++) {
+                       ia[i] = byteString.charCodeAt(i);
+                   }
+                   return new Blob([ab], { type: 'image/jpeg' });
+                 }
+                 
+                 
+                 function detect_object(url) {
+                 
+                 
+                       const computerVisionKey = document.getElementById('visionkey').value;
+                       const computerVisionEndPoint = document.getElementById('visionendpoint').value;
+                       const cognitiveServiceCredentials = new msRest.ApiKeyCredentials({
+                           inHeader: {
+                           "Ocp-Apim-Subscription-Key": computerVisionKey
+                           }
+                           });
+                       const client = new Azure.CognitiveservicesComputervision.ComputerVisionClient(
+                           cognitiveServiceCredentials,
+                           computerVisionEndPoint
+                           );
+                 
+                   const options = {
+                     maxCandidates: 1,
+                     language: "en"
+                   };
+                 
+                   client
+                     .detectObjectsInStream(url, options)
+                     .then((result) => {
+                       console.log("The result is:");
+                       drawBoundary(result);
+                     })
+                     .catch((err) => {
+                       console.log("An error occurred:");
+                       console.error(err);
+                     });
+                 
+                 
+                     };
+
+            var video;
+            var webcamStream;
+
+            function startWebcam() {
+              if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia(
+
+                    // constraints
+                    {
+                      video: true,
+                      audio: false
+                    }).then(
+
+                    // successCallback
+                    function (localMediaStream) {
+                      video.srcObject = localMediaStream;
+                      webcamStream = localMediaStream;
+                    })
+                  .catch(
+                    // errorCallback
+                    function (err) {
+                      console.log("The following error occured: " + err);
+                    })
+
+              } else {
+                console.log("getUserMedia not supported");
+              }
+            }
+                 
+         </script>
+   </body>
+</html>
+
