@@ -1,0 +1,25 @@
+{
+  "name": "thirdeye",
+  "version": "1.0.0",
+  "description": "",
+  "main": "support.js",
+  "dependencies": {
+    "@azure/cognitiveservices-computervision": "^6.0.0",
+    "@azure/ms-rest-js": "^2.0.4",
+    "bootstrap": "^4.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gusfelhberg/ThirdEye.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gusfelhberg/ThirdEye/issues"
+  },
+  "homepage": "https://github.com/gusfelhberg/ThirdEye#readme"
+}
