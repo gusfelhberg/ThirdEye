@@ -234,7 +234,10 @@ function startWebcam() {
         // constraints
         {
           video: true,
-          audio: false
+          audio: false,
+          facingMode: { 
+                exact: 'environment'
+                }
         }).then(
 
         // successCallback
