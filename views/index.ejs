@@ -369,6 +369,8 @@ const handleStream = (stream) => {
   streamStarted = true;
 };
 
+getCameraSelection();
+
 cameraOptions.onchange = () => {
   const updatedConstraints = {
     ...constraints,
