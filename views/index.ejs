@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="UTF-8">
+      <title>Thrid Eye - Hazard Detector</title>
+      <link rel="stylesheet" href="../css/bootstrap.min.css">
+      <link rel="stylesheet" href="../css/custom.css">
+      <!--   <script src="js/bootstrap.min.js"></script> -->
+      <script src="../node_modules/@azure/ms-rest-js/dist/msRest.browser.js"></script>
+      <script src="../node_modules/@azure/cognitiveservices-computervision/dist/cognitiveservices-computervision.js"></script>
+      <script  type="text/javascript" src="../support.js"></script>      
+   </head>
+   <body>
+      <p>
+      <div class="container">
+         <div class="row">
+            <div class="col">
+               <img src="https://www.worksafebc.com/img/worksafebc_logo.jpg">
+            </div>
+            <div class="col">
+               <center>
+                  <h2>Hackathon 2019</h2>
+               </center>
+            </div>
+            <div class="col">
+               <center><img src="https://www.chakras.info/wp-content/uploads/open-third-eye.jpg" height="50"></center>
+            </div>
+         </div>
+               <div>
+            Computer Vision Key:<br> <input id="visionkey" type="text" size="50"  ><p>
+            Computer Vision End Point: <br><input id="visionendpoint" size="50" ><br>
+            </div>
+         <p>
+         <div>
+            <h3>Select the hazards to verify:</h3>
+            <!-- Default unchecked -->
+            <div class="custom-control custom-checkbox">
+               <input type="checkbox" class="custom-control-input" id="hardhat" value='hardhat' checked onclick="checkCheckboxes();">
+               <label class="custom-control-label" for="hardhat">Hard Hats</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+               <input type="checkbox" class="custom-control-input" id="goggle" value='goggle' checked onclick="checkCheckboxes();">
+               <label class="custom-control-label" for="goggle">Safety Goggles</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+               <input type="checkbox" class="custom-control-input" id="vest" value="vest" checked onclick="checkCheckboxes();">
+               <label class="custom-control-label" for="vest">Vests</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+               <input type="checkbox" class="custom-control-input" id="saw" value="saw" checked onclick="checkCheckboxes();">
+               <label class="custom-control-label" for="saw">Industrial Saws</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+               <input type="checkbox" class="custom-control-input" id="person" value="person" checked onclick="checkCheckboxes();">
+               <label class="custom-control-label" for="person">Person</label>
+            </div>
+         </div>
+         <p>
+         <div>
+            <button onclick="startWebcam();">Start WebCam</button>
+            <button onclick="stopPrediction();">Stop WebCam</button>
+         </div>
+         <p>
+         <p>
+            <canvas id="canvas" width="640" height="480"></canvas>
+            <video  width=640 height=480 id="video"  autoplay></video>
+         <p>
+      </div>
+
+
+          
+
+   </body>
+</html>
+
