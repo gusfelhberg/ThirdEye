@@ -157,7 +157,7 @@ function stopPrediction() {
 
 video.addEventListener('play', function () {
   var $this = this; //cache
-  document.getElementById("video").style.display = "none";
+  // document.getElementById("video").style.display = "none";
   (function loop() {
     if (continuePrediction) { //!$this.paused && !$this.ended) {
       ctx.drawImage($this, 0, 0);
