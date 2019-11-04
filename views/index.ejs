@@ -201,7 +201,10 @@
                         .then((result) => {
                             console.log("The result is:");
                             console.log(result);
-                            drawBoundary(result);
+                            if (continuePrediction) {
+                                drawBoundary(result);
+                            }
+                            
                         })
                         .catch((err) => {
                             console.log("An error occurred:");
