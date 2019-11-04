@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../css/custom.css">
     <script src="../node_modules/@azure/ms-rest-js/dist/msRest.browser.js"></script>
     <script src="../node_modules/@azure/cognitiveservices-computervision/dist/cognitiveservices-computervision.js"></script>
+    <script src="../node_modules/@azure/cognitiveservices-customvision-prediction/dist/cognitiveservices-customvision-prediction.js"></script>
 
     <title>Thrid Eye - Hazard Detector</title>
 
@@ -34,7 +35,7 @@
             <div>
                 Computer Vision Key:
                 <br>
-                <input type="password" id="visionkey" type="text" size="50" value="bf00d070b31542af8ee0e6d62a2f0e47">
+                <input type="password" id="visionkey" type="text" size="50" value="e2502dcebc074e54a5c3c1751a38a8f5">
                 <p>
                     <!-- Computer Vision End Point: <br><input type="password" id="visionendpoint" size="50" ><br> -->
             </div>
@@ -83,6 +84,9 @@
             var canvas = document.getElementById('canvas');
             var ctx = canvas.getContext('2d');
             var video = document.getElementById('video');
+
+            // const PredictionApi = require("@azure/cognitiveservices-customvision-prediction");
+
 
             video.setAttribute('autoplay', '');
             video.setAttribute('muted', '');
@@ -223,19 +227,67 @@
                 });
             }
 
+            const request = require('request');
+
+            function get_prediction(){
+
+                let subscriptionKey = document.getElementById('visionkey').value; //process.env['COMPUTER_VISION_SUBSCRIPTION_KEY'];
+                let endpoint = 'https://westus2.api.cognitive.microsoft.com/'; //process.env['COMPUTER_VISION_ENDPOINT']
+                if (!subscriptionKey) { throw new Error('Set your environment variables for your subscription key and endpoint.'); }
+
+                var uriBase = endpoint + 'vision/v2.1/analyze';
+
+                const imageUrl =
+                    'https://upload.wikimedia.org/wikipedia/commons/3/3c/Shaki_waterfall.jpg';
+
+                // Request parameters.
+                const params = {
+                    'visualFeatures': 'Categories,Description,Color',
+                    'details': '',
+                    'language': 'en'
+                };
+
+                const options = {
+                    uri: uriBase,
+                    qs: params,
+                    body: '{"url": ' + '"' + imageUrl + '"}',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Ocp-Apim-Subscription-Key' : subscriptionKey
+                    }
+                };
+
+                request.post(options, (error, response, body) => {
+                  if (error) {
+                    console.log('Error: ', error);
+                    return;
+                  }
+                  let jsonResponse = JSON.stringify(JSON.parse(body), null, '  ');
+                  console.log('JSON Response\n');
+                  console.log(jsonResponse);
+                });
+
+            }
+
+            get_prediction();
+
 
 
             function detect_object(url) {
 
                 if (continuePrediction) {
                     const computerVisionKey = document.getElementById('visionkey').value;
-                    const computerVisionEndPoint = 'https://westus.api.cognitive.microsoft.com/';
+                    const computerVisionEndPoint = 'https://westus2.api.cognitive.microsoft.com/';
                     const cognitiveServiceCredentials = new msRest.ApiKeyCredentials({
                         inHeader: {
                             "Ocp-Apim-Subscription-Key": computerVisionKey
                         }
                     });
-                    const client = new Azure.CognitiveservicesComputervision.ComputerVisionClient(
+                    // const client = new Azure.CognitiveservicesComputervision.ComputerVisionClient(
+                    //     cognitiveServiceCredentials,
+                    //     computerVisionEndPoint
+                    // );
+                    const client = new Azure.CognitiveservicesCustomvisionPrediction.PredictionApi.PredictionAPIClient(
                         cognitiveServiceCredentials,
                         computerVisionEndPoint
                     );

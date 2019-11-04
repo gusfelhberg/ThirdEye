@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <script src="../node_modules/@azure/ms-rest-js/dist/msRest.browser.js"></script>
+    <script src="../node_modules/@azure/cognitiveservices-computervision/dist/cognitiveservices-computervision.js"></script>
+    <script src="../node_modules/@azure/cognitiveservices-customvision-prediction/dist/cognitiveservices-customvision-prediction.js"></script>
+
+    <title>Thrid Eye - Hazard Detector</title>
+
+</head>
+
+<body>
+    <p>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <img src="https://www.worksafebc.com/img/worksafebc_logo.jpg">
+                </div>
+                <div class="col">
+                    <center>
+                        <h2>Hackathon 2019</h2>
+                    </center>
+                </div>
+                <div class="col">
+                    <center><img src="https://www.chakras.info/wp-content/uploads/open-third-eye.jpg" height="50"></center>
+                </div>
+            </div>
+            <div>
+                Computer Vision Key:
+                <br>
+                <input type="password" id="visionkey" type="text" size="50" value="e2502dcebc074e54a5c3c1751a38a8f5">
+                <p>
+                    <!-- Computer Vision End Point: <br><input type="password" id="visionendpoint" size="50" ><br> -->
+            </div>
+         <!--    <p>
+                <div>
+                    <h3>Select the hazards to verify:</h3>
+             
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="hardhat" value='hardhat' checked onclick="checkCheckboxes();">
+                        <label class="custom-control-label" for="hardhat">Hard Hats</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="goggle" value='goggle' checked onclick="checkCheckboxes();">
+                        <label class="custom-control-label" for="goggle">Safety Goggles</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="vest" value="vest" checked onclick="checkCheckboxes();">
+                        <label class="custom-control-label" for="vest">Vests</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="saw" value="saw" checked onclick="checkCheckboxes();">
+                        <label class="custom-control-label" for="saw">Industrial Saws</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="person" value="person" checked onclick="checkCheckboxes();">
+                        <label class="custom-control-label" for="person">Person</label>
+                    </div>
+                </div>
+                <p> -->
+
+                    <!-- <div>
+                        <button onclick="startWebcam();">Start WebCam</button>
+                        <button onclick="stopPrediction();">Stop WebCam</button>
+                    </div> -->
+                    <p>
+                        <p>
+                            <canvas id="canvas" width="640" height="480"></canvas>
+                            <video width=640 height=480 id="video" autoplay></video>
+                            <p>
+        </div>
+
+        <script>
+
+
+
+            const request = require('request');
+
+function get_prediction(){
+
+                let subscriptionKey = document.getElementById('visionkey').value; //process.env['COMPUTER_VISION_SUBSCRIPTION_KEY'];
+                let endpoint = 'https://westus2.api.cognitive.microsoft.com/'; //process.env['COMPUTER_VISION_ENDPOINT']
+                if (!subscriptionKey) { throw new Error('Set your environment variables for your subscription key and endpoint.'); }
+
+                var uriBase = endpoint + 'vision/v2.1/analyze';
+
+                const imageUrl =
+                    'https://upload.wikimedia.org/wikipedia/commons/3/3c/Shaki_waterfall.jpg';
+
+                // Request parameters.
+                const params = {
+                    'visualFeatures': 'Categories,Description,Color',
+                    'details': '',
+                    'language': 'en'
+                };
+
+                const options = {
+                    uri: uriBase,
+                    qs: params,
+                    body: '{"url": ' + '"' + imageUrl + '"}',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Ocp-Apim-Subscription-Key' : subscriptionKey
+                    }
+                };
+
+                request.post(options, (error, response, body) => {
+                  if (error) {
+                    console.log('Error: ', error);
+                    return;
+                  }
+                  let jsonResponse = JSON.stringify(JSON.parse(body), null, '  ');
+                  console.log('JSON Response\n');
+                  console.log(jsonResponse);
+                });
+
+            }
+
+            get_prediction();
+
+                    </script>
+
+</body>
+
+</html>
