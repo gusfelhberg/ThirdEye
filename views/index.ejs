@@ -34,7 +34,7 @@
             <div>
                 Computer Vision Key:
                 <br>
-                <input type="password" id="visionkey" type="text" size="50">
+                <input type="password" id="visionkey" type="text" size="50" value="bf00d070b31542af8ee0e6d62a2f0e47">
                 <p>
                     <!-- Computer Vision End Point: <br><input type="password" id="visionendpoint" size="50" ><br> -->
             </div>
@@ -77,6 +77,9 @@
         </div>
 
         <script>
+
+            
+
             var canvas = document.getElementById('canvas');
             var ctx = canvas.getContext('2d');
             var video = document.getElementById('video');
@@ -106,60 +109,104 @@
             var h = 0;
             var w = 0;
 
+            var current_result = [] ;
+            // var object
+
             function drawBoundary(result) {
-                for (i = 0; i < result.objects.length; i++) {
+                // console.log(typeof(result))
+                // if (result != []) {
+                //     print('will draw')
+                    for (i = 0; i < result.objects.length; i++) {
+                        console.log('objects '+result.objects.length)
 
-                    //remove this line if you don't want to restrict the predictions
-                    if (values.includes(result.objects[i].object)) {
+                        //remove this line if you don't want to restrict the predictions
+                        if (values.includes(result.objects[i].object)) {
 
-                        ctx.beginPath();
-                        ctx.lineWidth = "6";
+                            ctx.beginPath();
+                            ctx.lineWidth = "6";
 
-                        var object_class = result.objects[i].object;
+                            var object_class = result.objects[i].object;
 
-                        switch (object_class) {
-                            case "person":
-                                ctx.fillStyle = "red";
-                                ctx.strokeStyle = "red";
-                                break;
+                            switch (object_class) {
+                                case "person":
+                                    ctx.fillStyle = "red";
+                                    ctx.strokeStyle = "red";
+                                    break;
 
-                            default:
-                                ctx.fillStyle = "Chartreuse";
-                                ctx.strokeStyle = "Chartreuse";
+                                default:
+                                    ctx.fillStyle = "Chartreuse";
+                                    ctx.strokeStyle = "Chartreuse";
+                            }
+
+                            // get rectangle boundaries
+                            x = result.objects[i].rectangle.x;
+                            y = result.objects[i].rectangle.y;
+                            w = result.objects[i].rectangle.w;
+                            h = result.objects[i].rectangle.h;
+
+                            ctx.font = "22px Arial";
+                            ctx.fillText(result.objects[i].object + " (confidence: " + result.objects[i].confidence + ")", x, y - 10);
+                            ctx.rect(x, y, w, h);
+                            ctx.stroke();
                         }
-
-                        // get rectangle boundaries
-                        x = result.objects[i].rectangle.x;
-                        y = result.objects[i].rectangle.y;
-                        w = result.objects[i].rectangle.w;
-                        h = result.objects[i].rectangle.h;
-
-                        ctx.font = "22px Arial";
-                        ctx.fillText(result.objects[i].object + " (confidence: " + result.objects[i].confidence + ")", x, y - 10);
-                        ctx.rect(x, y, w, h);
-                        ctx.stroke();
                     }
-                }
+                // }
             }
 
             var continuePrediction = true;
 
             function stopPrediction() {
                 continuePrediction = false;
+                webcamStream.getTracks()[0].stop();
+                document.getElementById("video").style.display = "none";
             }
+
+            var loop_count = 0;
 
             video.addEventListener('play', function() {
                 var $this = this; //cache
-                // document.getElementById("video").style.display = "none";
+                document.getElementById("video").style.display = "none";
                 (function loop() {
-                    if (continuePrediction) { //!$this.paused && !$this.ended) {
-                        ctx.drawImage($this, 0, 0);
-                        var blob = b64toBlob(canvas.toDataURL());
-                        detect_object(blob);
-                        setTimeout(loop, 1000 / 10); // drawing at 10fps
+                    if (continuePrediction & loop_count < 1000) { //!$this.paused && !$this.ended) {
 
+                        ctx.drawImage($this, 0, 0);
+                        
+                        var blob = b64toBlob(canvas.toDataURL());
+
+                        if (loop_count == 0 | loop_count % 10 == 0) {
+                            // console.log('will predict')
+                            // console.log(current_result)
+                            
+                            detect_object(blob);
+                            // console.log(current_result)
+                        }
+                        console.log(current_result);
+                        console.log(loop_count);
+                        if (loop_count > 5) {
+                            drawBoundary(current_result);
+                        }
+                        
+                        loop_count = loop_count + 1;
+                        
+                        // loop();
+                        setTimeout(loop, 1000 / 10); // drawing at 30fps
+
+
+
+                        
                     }
                 })();
+                // for (i = 0; i < cars.length; i++) { 
+                //     if (continuePrediction) { //!$this.paused && !$this.ended) {
+                //         ctx.drawImage($this, 0, 0);
+                //         var blob = b64toBlob(canvas.toDataURL());
+                //         detect_object(blob);
+                //         // loop();
+                //         setTimeout(loop, 1000 / 100); // drawing at 30fps
+
+                //     }
+                // }
+                            
             }, 0);
 
             function b64toBlob(dataURI) {
@@ -175,6 +222,8 @@
                     type: 'image/jpeg'
                 });
             }
+
+
 
             function detect_object(url) {
 
@@ -200,10 +249,13 @@
                         .detectObjectsInStream(url, options)
                         .then((result) => {
                             console.log("The result is:");
-                            console.log(result);
-                            if (continuePrediction) {
-                                drawBoundary(result);
-                            }
+                            // console.log(result);
+                            current_result = result;
+                            // console.log(current_result)
+                            // if (continuePrediction) {
+                            //     // drawBoundary(result);
+                            // }
+                            // return result;
                             
                         })
                         .catch((err) => {
@@ -216,6 +268,8 @@
 
             var video;
             var webcamStream;
+
+
 
             function startWebcam() {
                 checkCheckboxes();
