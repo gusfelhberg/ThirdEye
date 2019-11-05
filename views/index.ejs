@@ -55,12 +55,12 @@
                         <input type="checkbox" class="custom-control-input" id="hardhat" value='Hat' checked onclick="checkCheckboxes();">
                         <label class="custom-control-label" for="hardhat">Hard Hats</label>
                     </div>
-                    
+                    <p>
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="vest" value="vest" checked onclick="checkCheckboxes();">
                         <label class="custom-control-label" for="vest">Vests</label>
                     </div>
-                    
+                    <p>
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="saw" value="Saw" checked onclick="checkCheckboxes();">
                         <label class="custom-control-label" for="saw">Industrial Saws</label>
@@ -85,10 +85,6 @@
            var canvas = document.getElementById('canvas');
            var ctx = canvas.getContext('2d');
            var video = document.getElementById('video');
-
-           video.setAttribute('autoplay', '');
-           video.setAttribute('muted', '');
-           video.setAttribute('playsinline', '');
 
             var values = [];
 
@@ -166,8 +162,8 @@
                                     ctx.strokeStyle = "red";
                                     break;                                                              
                                 default:
-                                    ctx.fillStyle = "Chartreuse";
-                                    ctx.strokeStyle = "Chartreuse";
+                                    ctx.fillStyle = "SeaGreen";
+                                    ctx.strokeStyle = "SeaGreen";
                             }
 
                             // get rectangle boundaries
@@ -177,7 +173,7 @@
                             h = result.predictions[i].boundingBox.height*480;
 
 
-                            ctx.font = "22px Arial";
+                            ctx.font = "22px Arial Black";
                             ctx.fillText(object_class + " (prob: " + (result.predictions[i].probability*100).toFixed(2) + "%)", x, y - 10);
                             ctx.rect(x, y, w, h);
                             ctx.stroke();
@@ -188,19 +184,15 @@
 
             var continuePrediction = true;
 
-            function stopPrediction() {
-                continuePrediction = false;
-                webcamStream.getTracks()[0].stop();
-                document.getElementById("video").style.display = "none";
-            }
+
 
             var loop_count = 0;
 
             video.addEventListener('play', function() {
                 var $this = this; //cache
-                // document.getElementById("video").style.display = "none";
+                document.getElementById("video").style.display = "none";
                 (function loop() {
-                    if (continuePrediction & loop_count < 1000) { //!$this.paused && !$this.ended) {
+                    if (continuePrediction & loop_count < 10000) { //!$this.paused && !$this.ended) {
 
                         ctx.drawImage($this, 0, 0);
                         
@@ -218,6 +210,12 @@
 
                             
             }, 0);
+
+            function stopPrediction() {
+                continuePrediction = false;
+                webcamStream.getTracks()[0].stop();
+                document.getElementById("video").style.display = "none";
+            }
 
             function b64toBlob(dataURI) {
 
@@ -263,7 +261,7 @@
 
             };
 
-            var video;
+            // var video;
             var webcamStream;
 
 
