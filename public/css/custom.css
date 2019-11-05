@@ -20,3 +20,6 @@
     display: none;   
 }
 
+#video {
+    visibility: hidden;
+}
