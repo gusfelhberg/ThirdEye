@@ -75,7 +75,7 @@
                     <p>
                         <p>
                             <canvas id="canvas" width="640" height="480"></canvas>
-                            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                           <!--  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
                             <video width=640 height=480 id="video" autoplay></video>
                             <p>
         </div>
@@ -145,7 +145,7 @@
                     for (i = 0; i < result.predictions.length; i++) {
 
                         //remove this line if you don't want to restrict the predictions
-                        if (values.includes(result.predictions[i].tagName) &  result.predictions[i].probability > 0.5) {
+                        if (values.includes(result.predictions[i].tagName) &  result.predictions[i].probability > 0.2) {
 
                             ctx.beginPath();
                             ctx.lineWidth = "6";
@@ -199,18 +199,16 @@
                     if (continuePrediction & loop_count < 10000) { //!$this.paused && !$this.ended) {
 
                         ctx.drawImage($this, 0, 0);
-
-                        // document.getElementById("video").style.display = "none";
                         
                         var blob = b64toBlob(canvas.toDataURL());
 
-                        if (loop_count == 0 | loop_count % 5 == 0) {
+                        if (loop_count == 0 | loop_count % 3 == 0) {
                             detect_object(blob);
                         }
 
                         drawBoundary(current_result);
                         loop_count = loop_count + 1;
-                        setTimeout(loop, 1000 / 10); // drawing at 30fps  
+                        setTimeout(loop, 1000 / 10); // drawing at 10fps  
                     }
                 })();
 
