@@ -138,7 +138,7 @@
                     for (i = 0; i < result.predictions.length; i++) {
 
                         //remove this line if you don't want to restrict the predictions
-                        if (values.includes(result.predictions[i].tagName) &  result.predictions[i].probability > 0.75) {
+                        if (values.includes(result.predictions[i].tagName) &  result.predictions[i].probability > 0.5) {
 
                             ctx.beginPath();
                             ctx.lineWidth = "6";
