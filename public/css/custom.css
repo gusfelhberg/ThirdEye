@@ -81,3 +81,10 @@ label img {
   box-shadow: 0 0 5px #333;
   z-index: -1;
 }
+
+body {
+  font-family: 'Arial', sans-serif;
+  font-size: 30px;
+  font-weight: bold;
+  font-color:black;
+}

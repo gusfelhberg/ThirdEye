@@ -17,9 +17,6 @@
     <script src="../node_modules/@azure/cognitiveservices-computervision/dist/cognitiveservices-computervision.js"></script>
     <script src="../node_modules/@azure/cognitiveservices-customvision-prediction/dist/cognitiveservices-customvision-prediction.js"></script>
 
-
-    <!-- <script src="app.js"></script> -->
-
     <title>Third Eye - Hazard Detector</title>
 
 </head>
@@ -34,9 +31,9 @@
 
                 </div>
                 <div class="col" align="center">
-                    <p style = "font-family:roboto,serif;font-size:30px;font-style:bold;">
+                  <!--   <p style = "font-family:roboto,serif;font-size:30px;font-style:bold;"> -->
          Team THIRDEYE
-      </p>
+      <!-- </p> -->
                         <!-- <h2>Team THIRDEYE</h2> -->
                 </div>
                 <div class="col" align="right">
@@ -71,6 +68,10 @@
                         <button class="btn btn-primary btn-md active" onclick="startWebcam();">Start WebCam</button>
                         <button class="btn btn-primary btn-md active" onclick="stopPrediction();">Stop WebCam</button>
                     </div>
+
+
+
+
                     <p>
                         <p>
                             <canvas id="canvas" width="640" height="480"></canvas>
@@ -243,7 +244,7 @@
                     const customVisionPredictionKey = "fae1b9653c9942f5946d916910326f6a";
                     const customVisionPredictionEndPoint = 'https://westus2.api.cognitive.microsoft.com/';
                     const projectId = '2a3536a6-894f-4f4e-85cb-6a82d84e0e54';
-                    const iteration = "Iteration4";
+                    const iteration = "Iteration5";
 
                     const client = new Azure.CognitiveservicesCustomvisionPrediction.PredictionAPIClient(
                         customVisionPredictionKey,
