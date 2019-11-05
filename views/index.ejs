@@ -48,7 +48,7 @@
                     <h3>Select the hazards to verify:</h3>
                     
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="hardhat" value='hardhat' checked onclick="checkCheckboxes();">
+                        <input type="checkbox" class="custom-control-input" id="hardhat" value='Hat' checked onclick="checkCheckboxes();">
                         <label class="custom-control-label" for="hardhat">Hard Hats</label>
                     </div>
                     <div class="custom-control custom-checkbox">
@@ -60,7 +60,7 @@
                         <label class="custom-control-label" for="vest">Vests</label>
                     </div>
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="saw" value="saw" checked onclick="checkCheckboxes();">
+                        <input type="checkbox" class="custom-control-input" id="saw" value="Saw" checked onclick="checkCheckboxes();">
                         <label class="custom-control-label" for="saw">Industrial Saws</label>
                     </div>
                     <div class="custom-control custom-checkbox">
@@ -119,17 +119,20 @@
             var values = [];
 
             function checkCheckboxes() {
-                values = [];
-                var inputs = document.getElementsByTagName("input");
-                for (var i = inputs.length - 1; i >= 0; i--)
-                    if (inputs[i].type === "checkbox" && inputs[i].checked)
-                        values.push(inputs[i].value);
 
-                var inputs = document.getElementsByTagName("input");
-                for (var i = inputs.length - 1; i >= 0; i--)
-                    if (inputs[i].type === "checkbox" && inputs[i].checked)
-                        values.push('no_' + inputs[i].value);
-                console.log(values)
+                values = ['person','WithHat','NoHat']
+
+                // values = [];
+                // var inputs = document.getElementsByTagName("input");
+                // for (var i = inputs.length - 1; i >= 0; i--)
+                //     if (inputs[i].type === "checkbox" && inputs[i].checked)
+                //         values.push(inputs[i].value);
+
+                // var inputs = document.getElementsByTagName("input");
+                // for (var i = inputs.length - 1; i >= 0; i--)
+                //     if (inputs[i].type === "checkbox" && inputs[i].checked)
+                //         values.push('No' + inputs[i].value);
+                // console.log(values)
             };
 
             var x = 0;
@@ -138,28 +141,42 @@
             var w = 0;
 
             var current_result = [] ;
-            // var object
+
+            // var bestResults;
+
+            // function getBestResults(result) {
+            //     var tagIdList = [];
+            //     for (i = 0; i < result.predictions.length; i++) {
+            //         if (!tagIdList.includes(result.predictions[i].tagId)) {
+            //             tagIdList.push(result.predictions[i].tagId)
+            //         }
+            //     }
+
+            //     for (i = 0; i < tagIdList.length; i++) { 
+            //         for (j = 0; j < result.predictions.length & result.predictions[j] === tagIdList[i]; j++) {
+
+
+                        
+
+
+            //         }
+            // }
+
+
 
             function drawBoundary(result) {
-                // if (typeof result !== 'undefined') {
-                //     console.log(' there is result ')
-                // } else {
-                //     console.log('no result')
-                // }
-                // console.log('result:')
-                // console.log(result)
-                // if (result != []) {
-                //     print('will draw')
-                    for (i = 0; i < result.objects.length; i++) {
-                        console.log('objects '+result.objects.length)
+
+                if (typeof result.predictions !== 'undefined') {
+                    
+                    for (i = 0; i < result.predictions.length; i++) {
 
                         //remove this line if you don't want to restrict the predictions
-                        if (values.includes(result.objects[i].object)) {
+                        if (values.includes(result.predictions[i].tagName) &  result.predictions[i].probability > 0.75) {
 
                             ctx.beginPath();
                             ctx.lineWidth = "6";
 
-                            var object_class = result.objects[i].object;
+                            var object_class = result.predictions[i].tagName;
 
                             switch (object_class) {
                                 case "person":
@@ -173,18 +190,19 @@
                             }
 
                             // get rectangle boundaries
-                            x = result.objects[i].rectangle.x;
-                            y = result.objects[i].rectangle.y;
-                            w = result.objects[i].rectangle.w;
-                            h = result.objects[i].rectangle.h;
+                            x = result.predictions[i].boundingBox.left*640;
+                            y = result.predictions[i].boundingBox.top*480;
+                            w = result.predictions[i].boundingBox.width*640;
+                            h = result.predictions[i].boundingBox.height*480;
+
 
                             ctx.font = "22px Arial";
-                            ctx.fillText(result.objects[i].object + " (confidence: " + result.objects[i].confidence + ")", x, y - 10);
+                            ctx.fillText(object_class + " (prob: " + (result.predictions[i].probability*100).toFixed(2) + "%)", x, y - 10);
                             ctx.rect(x, y, w, h);
                             ctx.stroke();
                         }
                     }
-                // }
+                }
             }
 
             var continuePrediction = true;
@@ -207,29 +225,13 @@
                         
                         var blob = b64toBlob(canvas.toDataURL());
 
-                        // if (loop_count == 0 | loop_count % 10 == 0) {
-                            // console.log('will predict')
-                            // console.log(current_result)
-                        console.log('predicting .....'+ blob)
-                        detect_object(blob);
-                            // predict(blob);
-                            // predict(canvas.toDataURL());
-                            // console.log(current_result)
-                        // }
-                        // console.log(current_result);
-                        // console.log(loop_count);
-                        // if (loop_count > 5) {
-                        //     drawBoundary(current_result);
-                        // }
-                        // console.log(tmp)
+                        if (loop_count == 0 | loop_count % 5 == 0) {
+                            detect_object(blob);
+                        }
+
+                        drawBoundary(current_result);
                         loop_count = loop_count + 1;
-                        
-                        // loop();
-                        setTimeout(loop, 1000 / 10); // drawing at 30fps
-
-
-
-                        
+                        setTimeout(loop, 1000 / 10); // drawing at 30fps  
                     }
                 })();
 
@@ -250,60 +252,8 @@
                 });
             }
            
-            var prediction;
-            
-            var tmp = null;
-
-            function predict(blob) {
-                // console.log(blob)
-                 
-                    $.ajax({
-                        'url': "https://westus2.api.cognitive.microsoft.com/customvision/v3.0/Prediction/2a3536a6-894f-4f4e-85cb-6a82d84e0e54/detect/iterations/Iteration3/url", //+ $.param(params),
-                        'beforeSend': function(xhrObj){
-
-                            // xhrObj.setRequestHeader("Content-Type","application/json");
-                            // xhrObj.setRequestHeader("Content-Type","application/octet-stream");
-                            xhrObj.setRequestHeader("Content-Type","image/png");
-
-                            
-                            xhrObj.setRequestHeader("Prediction-key","fae1b9653c9942f5946d916910326f6a");
-                        },
-                        'type': "POST",
-                        // Request body
-                        // 'data': "{'url':'https://hardhatrecruits.co.nz/wp-content/uploads/2018/03/hardHat_1.jpg'}",
-                        'data': "'"+blob+"'",
-                        'success': function(data){
-                            tmp = data;
-                            // console.log(data)
-                        }
-                    });
-                    // .done(function(data) {
-                    //     tmp = data;
-                    //     // console.log(data)
-                    //     // console.log(prediction)
-                    //     // alert("success");
-                    //     // return data;
-                    // })
-                    // .fail(function(XMLHttpRequest, textStatus, errorThrown) {
-                    //     console.log(XMLHttpRequest)
-                    //     console.log(textStatus)
-                    //     console.log(errorThrown)
-                    //         // alert("some error");
-                
-                    //     alert("error!!!!");
-                    // });
-                    // return tmp;
-                };
-            
-            // console.log(tmp)
-
-            // detect_object('https://upload.wikimedia.org/wikipedia/commons/8/86/Killdeer_%28Charadrius_vociferus%29_copulating_-_portrait_crop.jpg')
-
             function detect_object(blob) {
-                console.log(blob)
 
-                // url =       "https://www.atlantatrails.com/wp-content/uploads/2019/02/north-georgia-waterfalls-1024x683.jpg";
-                // console.log(url)
                 if (continuePrediction) {
 
                     const customVisionPredictionKey = "fae1b9653c9942f5946d916910326f6a";
@@ -316,23 +266,16 @@
                         customVisionPredictionEndPoint
                     );
 
-                    // const options = {
-                    //     maxCandidates: 1,
-                    //     language: "en"
-                    // };
-
                     client
                         .detectImage(projectId, iteration, blob )
-                        // .detectObjectsInStream(url, options)
                         .then((result) => {
-                            console.log("The result is:");
+                            // console.log("The result is:");
                             console.log(result);
                             current_result = result;
                             
                         })
                         .catch((err) => {
                             console.log("An error occurred:");
-                            console.log(err);
                             console.error(err);
                         });
                 }
@@ -352,11 +295,8 @@
 
                             // constraints
                             {
-                                video: true,
-                                audio: false,
-                                facingMode: {
-                                    exact: 'environment'
-                                }
+                                video: { facingMode: "environment" },
+                                audio: false
                             }).then(
 
                             // successCallback
