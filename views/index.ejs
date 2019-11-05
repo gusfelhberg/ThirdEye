@@ -9,8 +9,13 @@
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/custom.css">
     <script src="../node_modules/@azure/ms-rest-js/dist/msRest.browser.js"></script>
+    <!-- <script  type="text/javascript" src="../object_detection.js"></script> -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <script src="../node_modules/@azure/cognitiveservices-computervision/dist/cognitiveservices-computervision.js"></script>
     <script src="../node_modules/@azure/cognitiveservices-customvision-prediction/dist/cognitiveservices-customvision-prediction.js"></script>
+
+
+    <!-- <script src="app.js"></script> -->
 
     <title>Thrid Eye - Hazard Detector</title>
 
@@ -37,12 +42,11 @@
                 <br>
                 <input type="password" id="visionkey" type="text" size="50" value="e2502dcebc074e54a5c3c1751a38a8f5">
                 <p>
-                    <!-- Computer Vision End Point: <br><input type="password" id="visionendpoint" size="50" ><br> -->
             </div>
             <p>
                 <div>
                     <h3>Select the hazards to verify:</h3>
-                    <!-- Default unchecked -->
+                    
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="hardhat" value='hardhat' checked onclick="checkCheckboxes();">
                         <label class="custom-control-label" for="hardhat">Hard Hats</label>
@@ -77,20 +81,40 @@
                             <p>
         </div>
 
-        <script>
+   <!-- 
+    <img id="img" src="https://hardhatrecruits.co.nz/wp-content/uploads/2018/03/hardHat_1.jpg" width=416 height=416 />
+    <script src="../js/object_detection.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+ -->
+<script type="text/javascript">
+
+    // let model = new ObjectDetection();
+    // (async () => {
+                       // model.load_model('../model/model.json');
+                    // })();
+    // console.log(model)
+    // const img_element =  document.getElementById('img');
+    // console.log(img_element)
+    // const inputs = tf.browser.fromPixels(img_element).expandDims().toFloat();
+    // console.log('inputs')
+    // console.log(inputs)
+    // const results = (async () => {
+                       // model.predict(inputs);
+                    // })();
+    // console.log(results)
+
 
             
 
-            var canvas = document.getElementById('canvas');
-            var ctx = canvas.getContext('2d');
-            var video = document.getElementById('video');
-
-            // const PredictionApi = require("@azure/cognitiveservices-customvision-prediction");
+           var canvas = document.getElementById('canvas');
+           var ctx = canvas.getContext('2d');
+           var video = document.getElementById('video');
 
 
-            video.setAttribute('autoplay', '');
-            video.setAttribute('muted', '');
-            video.setAttribute('playsinline', '');
+
+           video.setAttribute('autoplay', '');
+           video.setAttribute('muted', '');
+           video.setAttribute('playsinline', '');
 
             var values = [];
 
@@ -117,7 +141,13 @@
             // var object
 
             function drawBoundary(result) {
-                // console.log(typeof(result))
+                // if (typeof result !== 'undefined') {
+                //     console.log(' there is result ')
+                // } else {
+                //     console.log('no result')
+                // }
+                // console.log('result:')
+                // console.log(result)
                 // if (result != []) {
                 //     print('will draw')
                     for (i = 0; i < result.objects.length; i++) {
@@ -177,19 +207,21 @@
                         
                         var blob = b64toBlob(canvas.toDataURL());
 
-                        if (loop_count == 0 | loop_count % 10 == 0) {
+                        // if (loop_count == 0 | loop_count % 10 == 0) {
                             // console.log('will predict')
                             // console.log(current_result)
-                            
-                            detect_object(blob);
+                        console.log('predicting .....'+ blob)
+                        detect_object(blob);
+                            // predict(blob);
+                            // predict(canvas.toDataURL());
                             // console.log(current_result)
-                        }
-                        console.log(current_result);
-                        console.log(loop_count);
-                        if (loop_count > 5) {
-                            drawBoundary(current_result);
-                        }
-                        
+                        // }
+                        // console.log(current_result);
+                        // console.log(loop_count);
+                        // if (loop_count > 5) {
+                        //     drawBoundary(current_result);
+                        // }
+                        // console.log(tmp)
                         loop_count = loop_count + 1;
                         
                         // loop();
@@ -200,16 +232,7 @@
                         
                     }
                 })();
-                // for (i = 0; i < cars.length; i++) { 
-                //     if (continuePrediction) { //!$this.paused && !$this.ended) {
-                //         ctx.drawImage($this, 0, 0);
-                //         var blob = b64toBlob(canvas.toDataURL());
-                //         detect_object(blob);
-                //         // loop();
-                //         setTimeout(loop, 1000 / 100); // drawing at 30fps
 
-                //     }
-                // }
                             
             }, 0);
 
@@ -226,92 +249,90 @@
                     type: 'image/jpeg'
                 });
             }
+           
+            var prediction;
+            
+            var tmp = null;
 
-            const request = require('request');
+            function predict(blob) {
+                // console.log(blob)
+                 
+                    $.ajax({
+                        'url': "https://westus2.api.cognitive.microsoft.com/customvision/v3.0/Prediction/2a3536a6-894f-4f4e-85cb-6a82d84e0e54/detect/iterations/Iteration3/url", //+ $.param(params),
+                        'beforeSend': function(xhrObj){
 
-            function get_prediction(){
+                            // xhrObj.setRequestHeader("Content-Type","application/json");
+                            // xhrObj.setRequestHeader("Content-Type","application/octet-stream");
+                            xhrObj.setRequestHeader("Content-Type","image/png");
 
-                let subscriptionKey = document.getElementById('visionkey').value; //process.env['COMPUTER_VISION_SUBSCRIPTION_KEY'];
-                let endpoint = 'https://westus2.api.cognitive.microsoft.com/'; //process.env['COMPUTER_VISION_ENDPOINT']
-                if (!subscriptionKey) { throw new Error('Set your environment variables for your subscription key and endpoint.'); }
-
-                var uriBase = endpoint + 'vision/v2.1/analyze';
-
-                const imageUrl =
-                    'https://upload.wikimedia.org/wikipedia/commons/3/3c/Shaki_waterfall.jpg';
-
-                // Request parameters.
-                const params = {
-                    'visualFeatures': 'Categories,Description,Color',
-                    'details': '',
-                    'language': 'en'
-                };
-
-                const options = {
-                    uri: uriBase,
-                    qs: params,
-                    body: '{"url": ' + '"' + imageUrl + '"}',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Ocp-Apim-Subscription-Key' : subscriptionKey
-                    }
-                };
-
-                request.post(options, (error, response, body) => {
-                  if (error) {
-                    console.log('Error: ', error);
-                    return;
-                  }
-                  let jsonResponse = JSON.stringify(JSON.parse(body), null, '  ');
-                  console.log('JSON Response\n');
-                  console.log(jsonResponse);
-                });
-
-            }
-
-            get_prediction();
-
-
-
-            function detect_object(url) {
-
-                if (continuePrediction) {
-                    const computerVisionKey = document.getElementById('visionkey').value;
-                    const computerVisionEndPoint = 'https://westus2.api.cognitive.microsoft.com/';
-                    const cognitiveServiceCredentials = new msRest.ApiKeyCredentials({
-                        inHeader: {
-                            "Ocp-Apim-Subscription-Key": computerVisionKey
+                            
+                            xhrObj.setRequestHeader("Prediction-key","fae1b9653c9942f5946d916910326f6a");
+                        },
+                        'type': "POST",
+                        // Request body
+                        // 'data': "{'url':'https://hardhatrecruits.co.nz/wp-content/uploads/2018/03/hardHat_1.jpg'}",
+                        'data': "'"+blob+"'",
+                        'success': function(data){
+                            tmp = data;
+                            // console.log(data)
                         }
                     });
-                    // const client = new Azure.CognitiveservicesComputervision.ComputerVisionClient(
-                    //     cognitiveServiceCredentials,
-                    //     computerVisionEndPoint
-                    // );
-                    const client = new Azure.CognitiveservicesCustomvisionPrediction.PredictionApi.PredictionAPIClient(
-                        cognitiveServiceCredentials,
-                        computerVisionEndPoint
+                    // .done(function(data) {
+                    //     tmp = data;
+                    //     // console.log(data)
+                    //     // console.log(prediction)
+                    //     // alert("success");
+                    //     // return data;
+                    // })
+                    // .fail(function(XMLHttpRequest, textStatus, errorThrown) {
+                    //     console.log(XMLHttpRequest)
+                    //     console.log(textStatus)
+                    //     console.log(errorThrown)
+                    //         // alert("some error");
+                
+                    //     alert("error!!!!");
+                    // });
+                    // return tmp;
+                };
+            
+            // console.log(tmp)
+
+            // detect_object('https://upload.wikimedia.org/wikipedia/commons/8/86/Killdeer_%28Charadrius_vociferus%29_copulating_-_portrait_crop.jpg')
+
+            function detect_object(blob) {
+                console.log(blob)
+
+                // url =       "https://www.atlantatrails.com/wp-content/uploads/2019/02/north-georgia-waterfalls-1024x683.jpg";
+                // console.log(url)
+                if (continuePrediction) {
+
+                    const customVisionPredictionKey = "fae1b9653c9942f5946d916910326f6a";
+                    const customVisionPredictionEndPoint = 'https://westus2.api.cognitive.microsoft.com/';
+                    const projectId = '2a3536a6-894f-4f4e-85cb-6a82d84e0e54';
+                    const iteration = "Iteration4";
+
+                    const client = new Azure.CognitiveservicesCustomvisionPrediction.PredictionAPIClient(
+                        customVisionPredictionKey,
+                        customVisionPredictionEndPoint
                     );
 
-                    const options = {
-                        maxCandidates: 1,
-                        language: "en"
-                    };
+                    // const options = {
+                    //     maxCandidates: 1,
+                    //     language: "en"
+                    // };
 
                     client
-                        .detectObjectsInStream(url, options)
+                        .detectImage(projectId, iteration, blob )
+                        // .detectObjectsInStream(url, options)
                         .then((result) => {
                             console.log("The result is:");
-                            // console.log(result);
+                            console.log(result);
                             current_result = result;
-                            // console.log(current_result)
-                            // if (continuePrediction) {
-                            //     // drawBoundary(result);
-                            // }
-                            // return result;
                             
                         })
                         .catch((err) => {
                             console.log("An error occurred:");
+                            console.log(err);
                             console.error(err);
                         });
                 }
