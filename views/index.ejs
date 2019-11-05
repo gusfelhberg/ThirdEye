@@ -20,7 +20,7 @@
 
     <!-- <script src="app.js"></script> -->
 
-    <title>Thrid Eye - Hazard Detector</title>
+    <title>Third Eye - Hazard Detector</title>
 
 </head>
 
@@ -32,10 +32,11 @@
                     <img src="https://www.worksafebc.com/img/worksafebc_logo.jpg">
                 </div>
                 <div class="col" align="center">
-                        <h2>Hackathon 2019</h2>
+                        <h2>Team ThirdEye</h2>
                 </div>
                 <div class="col" align="right">
-                    <img src="https://www.chakras.info/wp-content/uploads/open-third-eye.jpg" height="50">
+                    <!-- <img src="https://www.chakras.info/wp-content/uploads/open-third-eye.jpg" height="50"> -->
+                    <img src="../img/eye.png" height="60">
                 </div>
             </div>
 <!--             <div>
@@ -83,19 +84,23 @@
 
             function checkCheckboxes() {
 
-                values = ['WithHat','NoHat','NoVest','WithVest','WithCover','NoCover']
+                values = [];
 
-                // values = [];
-                // var inputs = document.getElementsByTagName("input");
-                // for (var i = inputs.length - 1; i >= 0; i--)
-                //     if (inputs[i].type === "checkbox" && inputs[i].checked)
-                //         values.push(inputs[i].value);
+                if (document.getElementById("hardhat").checked) {
+                    values.push('WithHat');
+                    values.push('NoHat');
+                };
 
-                // var inputs = document.getElementsByTagName("input");
-                // for (var i = inputs.length - 1; i >= 0; i--)
-                //     if (inputs[i].type === "checkbox" && inputs[i].checked)
-                //         values.push('No' + inputs[i].value);
-                // console.log(values)
+                if (document.getElementById("vest").checked) {
+                    values.push('WithVest');
+                    values.push('NoVest');
+                };
+
+                if (document.getElementById("saw").checked) {
+                    values.push('WithCover');
+                    values.push('NoCover');
+                };      
+
             };
 
             var x = 0;
@@ -256,10 +261,7 @@
 
             };
 
-            // var video;
             var webcamStream;
-
-
 
             function startWebcam() {
                 checkCheckboxes();
