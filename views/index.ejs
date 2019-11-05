@@ -145,7 +145,7 @@
                     for (i = 0; i < result.predictions.length; i++) {
 
                         //remove this line if you don't want to restrict the predictions
-                        if (values.includes(result.predictions[i].tagName) &  result.predictions[i].probability > 0.2) {
+                        if (values.includes(result.predictions[i].tagName) &  result.predictions[i].probability > 0.35) {
 
                             ctx.beginPath();
                             ctx.lineWidth = "6";
@@ -202,13 +202,13 @@
                         
                         var blob = b64toBlob(canvas.toDataURL());
 
-                        if (loop_count == 0 | loop_count % 3 == 0) {
+                        if (loop_count == 0 | loop_count % 5 == 0) {
                             detect_object(blob);
                         }
 
                         drawBoundary(current_result);
                         loop_count = loop_count + 1;
-                        setTimeout(loop, 1000 / 10); // drawing at 10fps  
+                        setTimeout(loop, 1000 / 50); // drawing at 10fps  
                     }
                 })();
 
@@ -242,7 +242,7 @@
                     const customVisionPredictionKey = "fae1b9653c9942f5946d916910326f6a";
                     const customVisionPredictionEndPoint = 'https://westus2.api.cognitive.microsoft.com/';
                     const projectId = '2a3536a6-894f-4f4e-85cb-6a82d84e0e54';
-                    const iteration = "Iteration5";
+                    const iteration = "Iteration6";
 
                     const client = new Azure.CognitiveservicesCustomvisionPrediction.PredictionAPIClient(
                         customVisionPredictionKey,
