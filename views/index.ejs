@@ -188,6 +188,8 @@
                     if (continuePrediction & loop_count < 10000) { //!$this.paused && !$this.ended) {
 
                         ctx.drawImage($this, 0, 0);
+
+                        document.getElementById("video").style.display = "none";
                         
                         var blob = b64toBlob(canvas.toDataURL());
 
