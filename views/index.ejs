@@ -52,20 +52,12 @@
                         <label class="custom-control-label" for="hardhat">Hard Hats</label>
                     </div>
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="goggle" value='goggle' checked onclick="checkCheckboxes();">
-                        <label class="custom-control-label" for="goggle">Safety Goggles</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="vest" value="vest" checked onclick="checkCheckboxes();">
                         <label class="custom-control-label" for="vest">Vests</label>
                     </div>
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="saw" value="Saw" checked onclick="checkCheckboxes();">
                         <label class="custom-control-label" for="saw">Industrial Saws</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="person" value="person" checked onclick="checkCheckboxes();">
-                        <label class="custom-control-label" for="person">Person</label>
                     </div>
                 </div>
                 <p>
@@ -81,46 +73,21 @@
                             <p>
         </div>
 
-   <!-- 
-    <img id="img" src="https://hardhatrecruits.co.nz/wp-content/uploads/2018/03/hardHat_1.jpg" width=416 height=416 />
-    <script src="../js/object_detection.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
- -->
 <script type="text/javascript">
-
-    // let model = new ObjectDetection();
-    // (async () => {
-                       // model.load_model('../model/model.json');
-                    // })();
-    // console.log(model)
-    // const img_element =  document.getElementById('img');
-    // console.log(img_element)
-    // const inputs = tf.browser.fromPixels(img_element).expandDims().toFloat();
-    // console.log('inputs')
-    // console.log(inputs)
-    // const results = (async () => {
-                       // model.predict(inputs);
-                    // })();
-    // console.log(results)
-
-
             
-
            var canvas = document.getElementById('canvas');
            var ctx = canvas.getContext('2d');
            var video = document.getElementById('video');
 
-
-
-           video.setAttribute('autoplay', '');
-           video.setAttribute('muted', '');
-           video.setAttribute('playsinline', '');
+           // video.setAttribute('autoplay', '');
+           // video.setAttribute('muted', '');
+           // video.setAttribute('playsinline', '');
 
             var values = [];
 
             function checkCheckboxes() {
 
-                values = ['person','WithHat','NoHat']
+                values = ['WithHat','NoHat','NoVest','WithVest','WithCover','NoCover']
 
                 // values = [];
                 // var inputs = document.getElementsByTagName("input");
@@ -179,11 +146,18 @@
                             var object_class = result.predictions[i].tagName;
 
                             switch (object_class) {
-                                case "person":
+                                case "NoCover":
                                     ctx.fillStyle = "red";
                                     ctx.strokeStyle = "red";
                                     break;
-
+                                case "NoHat":
+                                    ctx.fillStyle = "red";
+                                    ctx.strokeStyle = "red";
+                                    break;
+                                case "NoVest":
+                                    ctx.fillStyle = "red";
+                                    ctx.strokeStyle = "red";
+                                    break;                                                              
                                 default:
                                     ctx.fillStyle = "Chartreuse";
                                     ctx.strokeStyle = "Chartreuse";
@@ -217,7 +191,7 @@
 
             video.addEventListener('play', function() {
                 var $this = this; //cache
-                document.getElementById("video").style.display = "none";
+                // document.getElementById("video").style.display = "none";
                 (function loop() {
                     if (continuePrediction & loop_count < 1000) { //!$this.paused && !$this.ended) {
 
