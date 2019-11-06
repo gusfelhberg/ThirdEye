@@ -41,12 +41,12 @@
                     <img src="../img/eye.png" height="60">
                 </div>
             </div>
-<!--             <div>
+            <div>
                 Computer Vision Key:
                 <br>
-                <input class="form-control" type="password" id="visionkey" type="text" size="50" value="e2502dcebc074e54a5c3c1751a38a8f5">
+                <input class="form-control" type="password" id="visionkey" type="text" size="50">
                 <p>
-            </div> -->
+            </div>
             <p>
                 <div>
                     <h3>Select the hazards to verify:</h3>
@@ -116,28 +116,6 @@
 
             var current_result = [] ;
 
-            // var bestResults;
-
-            // function getBestResults(result) {
-            //     var tagIdList = [];
-            //     for (i = 0; i < result.predictions.length; i++) {
-            //         if (!tagIdList.includes(result.predictions[i].tagId)) {
-            //             tagIdList.push(result.predictions[i].tagId)
-            //         }
-            //     }
-
-            //     for (i = 0; i < tagIdList.length; i++) { 
-            //         for (j = 0; j < result.predictions.length & result.predictions[j] === tagIdList[i]; j++) {
-
-
-                        
-
-
-            //         }
-            // }
-
-
-
             function drawBoundary(result) {
 
                 if (typeof result.predictions !== 'undefined') {
@@ -196,19 +174,19 @@
                 var $this = this; //cache
                 // document.getElementById("video").style.display = "none";
                 (function loop() {
-                    if (continuePrediction & loop_count < 10000) { //!$this.paused && !$this.ended) {
+                    if (continuePrediction & loop_count < 10000) { 
 
                         ctx.drawImage($this, 0, 0);
                         
                         var blob = b64toBlob(canvas.toDataURL());
 
-                        if (loop_count == 0 | loop_count % 5 == 0) {
+                        if (loop_count == 0 | loop_count % 2 == 0) {
                             detect_object(blob);
                         }
 
                         drawBoundary(current_result);
                         loop_count = loop_count + 1;
-                        setTimeout(loop, 1000 / 50); // drawing at 10fps  
+                        setTimeout(loop, 1000 / 100); // drawing at 10fps  
                     }
                 })();
 
@@ -239,7 +217,7 @@
 
                 if (continuePrediction) {
 
-                    const customVisionPredictionKey = "fae1b9653c9942f5946d916910326f6a";
+                    const customVisionPredictionKey = document.getElementById('visionkey').value;
                     const customVisionPredictionEndPoint = 'https://westus2.api.cognitive.microsoft.com/';
                     const projectId = '2a3536a6-894f-4f4e-85cb-6a82d84e0e54';
                     const iteration = "Iteration6";
@@ -252,7 +230,6 @@
                     client
                         .detectImage(projectId, iteration, blob )
                         .then((result) => {
-                            // console.log("The result is:");
                             console.log(result);
                             current_result = result;
                             
