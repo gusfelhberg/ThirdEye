@@ -1,278 +1,257 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/custom.css">
-    <script src="../node_modules/@azure/ms-rest-js/dist/msRest.browser.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="../node_modules/@azure/cognitiveservices-computervision/dist/cognitiveservices-computervision.js"></script>
-    <script src="../node_modules/@azure/cognitiveservices-customvision-prediction/dist/cognitiveservices-customvision-prediction.js"></script>
-
-    <title>Third Eye - Hazard Detector</title>
-
-</head>
-
-<body>
-    <p>
-        <div class="container">
-            <div class="row">
-                <div class="col" align="left">
-                    <img src="../img/hackathon.png" height="50">
-                    <!-- <img src="https://www.worksafebc.com/img/worksafebc_logo.jpg"> -->
-
-                </div>
-                <div class="col" align="center">
-                  <!--   <p style = "font-family:roboto,serif;font-size:30px;font-style:bold;"> -->
-         Team THIRDEYE
-      <!-- </p> -->
-                        <!-- <h2>Team THIRDEYE</h2> -->
-                </div>
-                <div class="col" align="right">
-                    <!-- <img src="https://www.chakras.info/wp-content/uploads/open-third-eye.jpg" height="50"> -->
-                    <img src="../img/eye.png" height="60">
-                </div>
-            </div>
-<!--             <div>
-                Computer Vision Key:
-                <br>
-                <input class="form-control" type="password" id="visionkey" type="text" size="50" value="e2502dcebc074e54a5c3c1751a38a8f5">
-                <p>
-            </div> -->
-            <p>
-                <div>
-                    <h3>Select the hazards to verify:</h3>
-                    <ul>
-                      <li><input type="checkbox" id="hardhat" checked onclick="checkCheckboxes();"/>
-                        <label for="hardhat"><img src="../img/hardhat.png" /></label>
-                      </li>
-                      <li><input type="checkbox" id="vest" checked onclick="checkCheckboxes();"/>
-                        <label for="vest"><img src="../img/vest.png" /></label>
-                      </li>
-                      <li><input type="checkbox" id="saw" checked onclick="checkCheckboxes();"/>
-                        <label for="saw"><img src="../img/saw.png" /></label>
-                      </li>
-                    </ul>
-                   
-                <p>
-
-                    <div>
-                        <button class="btn btn-primary btn-md active" onclick="startWebcam();">Start WebCam</button>
-                        <button class="btn btn-primary btn-md active" onclick="stopPrediction();">Stop WebCam</button>
-                    </div>
-
-
-
-
-                    <p>
-                        <p>
-                            <canvas id="canvas" width="640" height="480"></canvas>
-                           <!--  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
-                            <video width=640 height=480 id="video" autoplay></video>
-                            <p>
-        </div>
-
-<script type="text/javascript">
-            
-           var canvas = document.getElementById('canvas');
-           var ctx = canvas.getContext('2d');
-           var video = document.getElementById('video');
-
-            var values = [];
-
-            function checkCheckboxes() {
-
-                values = [];
-
-                if (document.getElementById("hardhat").checked) {
-                    values.push('WithHat');
-                    values.push('NoHat');
-                };
-
-                if (document.getElementById("vest").checked) {
-                    values.push('WithVest');
-                    values.push('NoVest');
-                };
-
-                if (document.getElementById("saw").checked) {
-                    values.push('WithCover');
-                    values.push('NoCover');
-                };      
-
-            };
-
-            var x = 0;
-            var y = 0;
-            var h = 0;
-            var w = 0;
-
-            var current_result = [] ;
-
-
-            function drawBoundary(result) {
-
-                if (typeof result.predictions !== 'undefined') {
-                    
-                    for (i = 0; i < result.predictions.length; i++) {
-
-                        //remove this line if you don't want to restrict the classes to be presented
-                        if (values.includes(result.predictions[i].tagName) &  result.predictions[i].probability > 0.35) {
-
-                            ctx.beginPath();
-                            ctx.lineWidth = "6";
-
-                            var object_class = result.predictions[i].tagName;
-
-                            switch (object_class) {
-                                case "NoCover":
-                                    ctx.fillStyle = "red";
-                                    ctx.strokeStyle = "red";
-                                    break;
-                                case "NoHat":
-                                    ctx.fillStyle = "red";
-                                    ctx.strokeStyle = "red";
-                                    break;
-                                case "NoVest":
-                                    ctx.fillStyle = "red";
-                                    ctx.strokeStyle = "red";
-                                    break;                                                              
-                                default:
-                                    ctx.fillStyle = "SeaGreen";
-                                    ctx.strokeStyle = "SeaGreen";
-                            }
-
-                            // get rectangle boundaries
-                            x = result.predictions[i].boundingBox.left*640;
-                            y = result.predictions[i].boundingBox.top*480;
-                            w = result.predictions[i].boundingBox.width*640;
-                            h = result.predictions[i].boundingBox.height*480;
-
-
-                            ctx.font = "22px Arial Black";
-                            ctx.fillText(object_class + " (prob: " + (result.predictions[i].probability*100).toFixed(2) + "%)", x, y - 10);
-                            ctx.rect(x, y, w, h);
-                            ctx.stroke();
-                        }
-                    }
-                }
-            }
-
-            var continuePrediction = true;
-
-
-
-            var loop_count = 0;
-
-            video.addEventListener('play', function() {
-                var $this = this; //cache
-                // document.getElementById("video").style.display = "none";
-                (function loop() {
-                    if (continuePrediction & loop_count < 10000) { //!$this.paused && !$this.ended) {
-
-                        ctx.drawImage($this, 0, 0);
-                        
-                        var blob = b64toBlob(canvas.toDataURL());
-
-                        if (loop_count == 0 | loop_count % 2 == 0) {
-                            detect_object(blob);
-                        }
-
-                        drawBoundary(current_result);
-                        loop_count = loop_count + 1;
-                        setTimeout(loop, 1000 / 100); // drawing at 100fps  
-                    }
-                })();
-
-                            
-            }, 0);
-
-            function stopPrediction() {
-                continuePrediction = false;
-                webcamStream.getTracks()[0].stop();
-                document.getElementById("video").style.display = "none";
-            }
-
-            function b64toBlob(dataURI) {
-
-                var byteString = atob(dataURI.split(',')[1]);
-                var ab = new ArrayBuffer(byteString.length);
-                var ia = new Uint8Array(ab);
-
-                for (var i = 0; i < byteString.length; i++) {
-                    ia[i] = byteString.charCodeAt(i);
-                }
-                return new Blob([ab], {
-                    type: 'image/jpeg'
-                });
-            }
-           
-            function detect_object(blob) {
-
-                if (continuePrediction) {
-
-                    const customVisionPredictionKey = "fae1b9653c9942f5946d916910326f6a";
-                    const customVisionPredictionEndPoint = 'https://westus2.api.cognitive.microsoft.com/';
-                    const projectId = '2a3536a6-894f-4f4e-85cb-6a82d84e0e54';
-                    const iteration = "Iteration6";
-
-                    const client = new Azure.CognitiveservicesCustomvisionPrediction.PredictionAPIClient(
-                        customVisionPredictionKey,
-                        customVisionPredictionEndPoint
-                    );
-
-                    client
-                        .detectImage(projectId, iteration, blob )
-                        .then((result) => {
-                            console.log(result);
-                            current_result = result;
-                            
-                        })
-                        .catch((err) => {
-                            console.log("An error occurred:");
-                            console.error(err);
-                        });
-                }
-
-            };
-
-            var webcamStream;
-
-            function startWebcam() {
-                checkCheckboxes();
-                continuePrediction = true;
-                if (navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia(
-
-                            // constraints
-                            {
-                                video: { facingMode: "environment" },
-                                audio: false
-                            }).then(
-
-                            // successCallback
-                            function(localMediaStream) {
-                                video.srcObject = localMediaStream;
-                                webcamStream = localMediaStream;
-                            })
-                        .catch(
-                            // errorCallback
-                            function(err) {
-                                console.log("The following error occured: " + err);
-                            })
-
-                } else {
-                    console.log("getUserMedia not supported");
-                }
-            }
-        </script>
-
-</body>
-
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+      <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+      <link rel="stylesheet" href="../css/bootstrap.min.css">
+      <link rel="stylesheet" href="../css/custom.css">
+      <script src="../node_modules/@azure/ms-rest-js/dist/msRest.browser.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+      <script src="../node_modules/@azure/cognitiveservices-computervision/dist/cognitiveservices-computervision.js"></script>
+      <script src="../node_modules/@azure/cognitiveservices-customvision-prediction/dist/cognitiveservices-customvision-prediction.js"></script>
+      <title>Third Eye - Hazard Detector</title>
+   </head>
+   <body>
+      <p>
+      <div class="container">
+      <div class="row">
+         <div class="col" align="left">
+            <img src="../img/hackathon.png" height="50">
+         </div>
+         <div class="col" align="center">
+            Team THIRDEYE
+         </div>
+         <div class="col" align="right">
+            <img src="../img/eye.png" height="60">
+         </div>
+      </div>
+      <div>
+         Computer Vision Key:
+         <br>
+         <input class="form-control" type="password" id="visionkey" type="text" size="50">
+         <p>
+      </div>
+      <p>
+      <div>
+         <h3>Select the hazards to verify:</h3>
+         <ul>
+            <li><input type="checkbox" id="hardhat" checked onclick="checkCheckboxes();"/>
+               <label for="hardhat"><img src="../img/hardhat.png" /></label>
+            </li>
+            <li><input type="checkbox" id="vest" checked onclick="checkCheckboxes();"/>
+               <label for="vest"><img src="../img/vest.png" /></label>
+            </li>
+            <li><input type="checkbox" id="saw" checked onclick="checkCheckboxes();"/>
+               <label for="saw"><img src="../img/saw.png" /></label>
+            </li>
+         </ul>
+         <p>
+         <div>
+            <button class="btn btn-primary btn-md active" onclick="startWebcam();">Start WebCam</button>
+            <button class="btn btn-primary btn-md active" onclick="stopPrediction();">Stop WebCam</button>
+         </div>
+         <p>
+         <p>
+            <canvas id="canvas" width="640" height="480"></canvas>
+            <video width=640 height=480 id="video" autoplay></video>
+         <p>
+      </div>
+      <script type="text/javascript">
+         var canvas = document.getElementById('canvas');
+         var ctx = canvas.getContext('2d');
+         var video = document.getElementById('video');
+         
+          var values = [];
+         
+          function checkCheckboxes() {
+         
+              values = [];
+         
+              if (document.getElementById("hardhat").checked) {
+                  values.push('WithHat');
+                  values.push('NoHat');
+              };
+         
+              if (document.getElementById("vest").checked) {
+                  values.push('WithVest');
+                  values.push('NoVest');
+              };
+         
+              if (document.getElementById("saw").checked) {
+                  values.push('WithCover');
+                  values.push('NoCover');
+              };      
+         
+          };
+         
+          var x = 0;
+          var y = 0;
+          var h = 0;
+          var w = 0;
+         
+          var current_result = [] ;
+         
+          function drawBoundary(result) {
+         
+              if (typeof result.predictions !== 'undefined') {
+                  
+                  for (i = 0; i < result.predictions.length; i++) {
+         
+                      //remove this line if you don't want to restrict the classes to be presented
+                      if (values.includes(result.predictions[i].tagName) &  result.predictions[i].probability > 0.35) {
+         
+                          ctx.beginPath();
+                          ctx.lineWidth = "6";
+         
+                          var object_class = result.predictions[i].tagName;
+         
+                          switch (object_class) {
+                              case "NoCover":
+                                  ctx.fillStyle = "red";
+                                  ctx.strokeStyle = "red";
+                                  break;
+                              case "NoHat":
+                                  ctx.fillStyle = "red";
+                                  ctx.strokeStyle = "red";
+                                  break;
+                              case "NoVest":
+                                  ctx.fillStyle = "red";
+                                  ctx.strokeStyle = "red";
+                                  break;                                                              
+                              default:
+                                  ctx.fillStyle = "SeaGreen";
+                                  ctx.strokeStyle = "SeaGreen";
+                          }
+         
+                          // get rectangle boundaries
+                          x = result.predictions[i].boundingBox.left*640;
+                          y = result.predictions[i].boundingBox.top*480;
+                          w = result.predictions[i].boundingBox.width*640;
+                          h = result.predictions[i].boundingBox.height*480;
+         
+         
+                          ctx.font = "22px Arial Black";
+                          ctx.fillText(object_class + " (prob: " + (result.predictions[i].probability*100).toFixed(2) + "%)", x, y - 10);
+                          ctx.rect(x, y, w, h);
+                          ctx.stroke();
+                      }
+                  }
+              }
+          }
+         
+          var continuePrediction = true;
+         
+         
+         
+          var loop_count = 0;
+         
+          video.addEventListener('play', function() {
+              var $this = this; //cache
+              // document.getElementById("video").style.display = "none";
+              (function loop() {
+                  if (continuePrediction & loop_count < 10000) { 
+         
+                      ctx.drawImage($this, 0, 0);
+                      
+                      var blob = b64toBlob(canvas.toDataURL());
+         
+                      if (loop_count == 0 | loop_count % 2 == 0) {
+                          detect_object(blob);
+                      }
+         
+                      drawBoundary(current_result);
+                      loop_count = loop_count + 1;
+                      setTimeout(loop, 1000 / 100); // drawing at 100fps  
+         
+                  }
+              })();
+         
+                          
+          }, 0);
+         
+          function stopPrediction() {
+              continuePrediction = false;
+              webcamStream.getTracks()[0].stop();
+              document.getElementById("video").style.display = "none";
+          }
+         
+          function b64toBlob(dataURI) {
+         
+              var byteString = atob(dataURI.split(',')[1]);
+              var ab = new ArrayBuffer(byteString.length);
+              var ia = new Uint8Array(ab);
+         
+              for (var i = 0; i < byteString.length; i++) {
+                  ia[i] = byteString.charCodeAt(i);
+              }
+              return new Blob([ab], {
+                  type: 'image/jpeg'
+              });
+          }
+         
+          function detect_object(blob) {
+         
+              if (continuePrediction) {
+         
+                  const customVisionPredictionKey = document.getElementById('visionkey').value;
+                  const customVisionPredictionEndPoint = 'https://westus2.api.cognitive.microsoft.com/';
+                  const projectId = '2a3536a6-894f-4f4e-85cb-6a82d84e0e54';
+                  const iteration = "Iteration6";
+         
+                  const client = new Azure.CognitiveservicesCustomvisionPrediction.PredictionAPIClient(
+                      customVisionPredictionKey,
+                      customVisionPredictionEndPoint
+                  );
+         
+                  client
+                      .detectImage(projectId, iteration, blob )
+                      .then((result) => {
+                          console.log(result);
+                          current_result = result;
+                          
+                      })
+                      .catch((err) => {
+                          console.log("An error occurred:");
+                          console.error(err);
+                      });
+              }
+         
+          };
+         
+          var webcamStream;
+         
+          function startWebcam() {
+              checkCheckboxes();
+              continuePrediction = true;
+              if (navigator.mediaDevices.getUserMedia) {
+                  navigator.mediaDevices.getUserMedia(
+         
+                          // constraints
+                          {
+                              video: { facingMode: "environment" },
+                              audio: false
+                          }).then(
+         
+                          // successCallback
+                          function(localMediaStream) {
+                              video.srcObject = localMediaStream;
+                              webcamStream = localMediaStream;
+                          })
+                      .catch(
+                          // errorCallback
+                          function(err) {
+                              console.log("The following error occured: " + err);
+                          })
+         
+              } else {
+                  console.log("getUserMedia not supported");
+              }
+          }
+      </script>
+   </body>
 </html>
+
